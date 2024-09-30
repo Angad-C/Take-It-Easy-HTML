@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Take it Easy - own your pace</title>
+	<style>
+		/* styles for the banner section */
+		.banner {
+			background-color: #ffffff;
+			color: white;
+			height: 100px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 24px;
+		}
+
+		/* styles for the two column sections */
+		.container {
+			display: flex;
+			flex-wrap: wrap;
+			margin: 20px;
+		}
+
+		.left-column {
+			flex: 1;
+			margin: 10px;
+			padding: 20px;
+			background-color: #f8f9fa;
+			box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+			border-radius: 5px;
+			overflow-y: auto; /* add scroll bar when content is overflowed */
+			width: 20%;
+		}
+
+		.right-column {
+			flex: 4;
+			margin: 10px;
+			padding: 20px;
+			background-color: #f8f9fa;
+			box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+			border-radius: 5px;
+			overflow-y: auto; /* add scroll bar when content is overflowed */
+			width: 80%;
+		}
+
+		/* styles for the animal list */
+		.poem-list {
+			list-style: none;
+			padding: 0;
+		}
+
+		.poem-list li {
+			cursor: pointer;
+			padding: 5px;
+			border-radius: 5px;
+			margin-bottom: 5px;
+			background-color: #e9ecef;
+		}
+
+		.poem-list li:hover {
+			background-color: #ced4da;
+		}
+
+		.selected-animal {
+			font-weight: bold;
+		}
+	</style>
+	<script>
+		window.onload = function() {
+			// get the animal list and selected animal elements
+			var animalList = document.getElementById("poem-list");
+			var selectedAnimal = document.getElementById("selected-animal");
+
+			// add click event listeners to the animal list items
+			var animalItems = animalList.getElementsByTagName("li");
+			for (var i = 0; i < animalItems.length; i++) {
+				animalItems[i].addEventListener("click", function() {
+					// set the selected animal element text to the clicked item text
+					selectedAnimal.textContent = this.textContent;
+
+					// remove the selected class from all list items and add it to the clicked item
+					for (var j = 0; j < animalItems.length; j++) {
+						animalItems[j].classList.remove("selected-animal");
+					}
+					this.classList.add("selected-animal");
+				});
+			}
+		}
+	</script>
+</head>
+<body>
+	<!-- banner section -->
+	<div class="banner">
+		<h1><img src="Banner.png" height=90></img></h1>
+	</div>
+
+	<!-- two column sections -->
+	<div class="container">
+		<!-- left column for poem list -->
+		<div class="left-column column">
+			<h2>Poems</h2>
+			<ul class="poem-list" id="poem-list">
+				<li>Twinkle, twinkle --Jane Taylor</li>
+				<li>The Mock Turtle's Song -- Lewis Carroll</li>
+				<li>At the Zoo -- William Makepeace Thackeray</li>
+				<li>Mary had a little lamb -- Sarah Josepha Hale</li>
+				<li>Nature’s first green is gold -- Robert Frost</li>
+				<li>Autumn -- Alexander Posey</li>
+				<li>From A Railway Carriage -— Robert Louis Stevenson</li>
+				<li>Daddy fell into the pond! -— Alfred Noyes</li>
+				<li>How do you like to go up in a swing -— Robert Louis Stevenson</li>
+				<li>In winter I get up at night -- Robert Louis Stevenson</li>
+				<li>Who has seen the wind? -- Christina Rossetti</li>
+				<li>Hush little baby -- Anonymous</li>
+			</ul>
+		</div>
+        
+            <!-- right column for selected animal display -->
+            <div class="right-column column">
+                <h2>Selected Animal</h2>
+                <div class="selected-animal" id="selected-animal"></div>
+            </div>
+        </div>
+    </body>
+    </html>        

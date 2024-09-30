@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Planet Recognition</title>
+	<meta charset="UTF-8">
+	<style>
+		/* Style for the left section */
+		#left {
+			float: left;
+		}
+		
+		/* Style for the right section */
+		#right {
+			float: left;
+		}
+	</style>
+</head>
+<body>
+	<div id="left">
+		<h2>Poems</h2>
+		<ul>
+			<li id="twinkle">Twinkle</li>
+			<li id="mercury">Mercury</li>
+		</ul>
+	</div>
+	
+	<div id="right">
+		<h2>Select a Poem To Read</h2>
+		<p id="planet-name"></p>
+		<button id="recognition-btn" style="display: none;" onclick="startRecognition()" disabled>Start Reading</button>
+	</div>
+
+	<script>
+		var index = 0;
+        const poems = [
+            "Quick brown fox jumps over the lazy dog",
+            "Twinkle, Twinkle Little Star \n How I wonder what you are",
+        ];
+        var poemId = 0;
+        var poemwords = poems[poemId].split(" ");
+
+		var recognition;
+		function startRecognition() {
+			if ('webkitSpeechRecognition' in window) {
+				recognition = new webkitSpeechRecognition();
+				recognition.continuous = true;
+				recognition.interimResults = false;
+				recognition.lang = 'en-US';
+				recognition.start();
+				document.getElementById("recognition-btn").innerHTML = "Stop Reading";
+				document.getElementById("recognition-btn").onclick = stopRecognition;
+
+                var index = 0;
+				console.log("STARTING");
+                var faults = 0;
+                document.getElementById("right").innerHTML = "<h2>Let's Read One Word at a Time</h2><p><button id='recognition-btn' onclick='stopRecognition()'>Stop Reading</button><p><p>";
+                document.getElementById("right").innerHTML += poemwords[index];
+                var target = poemwords[index].toLowerCase();
+
+                recognition.onresult = function(event) {
+                    target = poemwords[index].toLowerCase().trim();
+                    var speechResult = event.results[event.results.length-1][0].transcript.toLowerCase().trim();
+
+                    if (target === speechResult) {
+						console.log("MATCH");
+                        index+=1;
+						if (poemwords.length > index) {
+	                        document.getElementById("right").innerHTML += " " + poemwords[index];
+						}
+                        faults = 0;
+                    } else {
+						console.log("MISMATCH target " + target +  " vs read " + speechResult + " " + (target === speechResult));
+                        faults+=1;
+                        if (faults >= 3) {
+                            faults = 0;
+                            index+=1;
+							if (poemwords.length > index) {
+                            	document.getElementById("right").innerHTML += " " + poemwords[index];
+							}
+                        }
+                    }
+					console.log("INDEX is " + index);
+
+                    if (poemwords.length <= index) {
+						stopRecognition();
+                        return;
+                    }
+
+                    console.log("=======> " +target + " " + speechResult + " " + index + " <======");
+                };
+
+			} else {
+				alert('Speech recognition is not supported in this browser.');
+			}
+		}
+    
+		function stopRecognition() {
+			recognition.stop();
+			document.getElementById("right").innerHTML = `<h2>Well Done</h2>
+			<p><h2>Select a Poem To Read</h2>
+				<p id="planet-name"></p>
+				<button id="recognition-btn" style="display: none;" onclick="startRecognition()" disabled>Start Reading</button>`;
+
+			document.getElementById("recognition-btn").innerHTML = "Start Reading";
+			document.getElementById("recognition-btn").onclick = startRecognition;
+		}
+
+        function setReadingPanel(poemId) {
+            document.getElementById("recognition-btn").disabled = false;
+            document.getElementById("recognition-btn").style.display = "";
+            poemwords = poems[poemId].split(" ");
+        }
+
+        // Set poem in left panel
+		document.getElementById("twinkle").addEventListener("click", function() {
+            setReadingPanel(0);
+		});
+
+		document.getElementById("mercury").addEventListener("click", function() {
+            setReadingPanel(1);
+		});
+    </script>
+</body>
+</html>
+

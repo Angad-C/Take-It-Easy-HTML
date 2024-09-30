@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Three Section Page with Animal List</title>
+	<style>
+		.banner {
+			background-color: #333;
+			color: #fff;
+			padding: 20px;
+			text-align: center;
+			font-size: 24px;
+			font-weight: bold;
+		}
+
+		.container {
+			display: flex;
+			flex-wrap: wrap;
+		}
+
+		.column {
+			box-sizing: border-box;
+			padding: 20px;
+			height: 500px;
+			overflow: auto;
+		}
+
+		.left-column {
+			flex-basis: 20%;
+			background-color: #ccc;
+		}
+
+		.right-column {
+			flex-basis: 80%;
+			background-color: #eee;
+		}
+
+		.animal-list li {
+			cursor: pointer;
+		}
+
+		.selected-animal {
+			font-size: 48px;
+			text-align: center;
+			margin-top: 50px;
+		}
+
+		.speech-button {
+			display: block;
+			margin: 20px auto;
+			padding: 10px;
+			background-color: #333;
+			color: #fff;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+		}
+
+		.speech-button:focus {
+			outline: none;
+		}
+	</style>
+</head>
+<body>
+	<!-- banner section -->
+	<div class="banner">
+		Three Section Page with Animal List
+	</div>
+
+	<!-- two column sections -->
+	<div class="container">
+		<!-- left column for animal list -->
+		<div class="left-column column">
+			<h2>Animal List</h2>
+			<ul class="animal-list" id="animal-list">
+				<li>Lion</li>
+				<li>Tiger</li>
+				<li>Bear</li>
+				<li>Elephant</li>
+				<li>Giraffe</li>
+				<li>Monkey</li>
+				<li>Kangaroo</li>
+				<li>Hippo</li>
+				<li>Rhinoceros</li>
+				<li>Wolf</li>
+				<li>Crocodile</li>
+				<li>Penguin</li>
+				<li>Panda</li>
+			</ul>
+		</div>
+
+		<!-- right column for selected animal display -->
+		<div class="right-column column">
+			<h2>Selected Animal</h2>
+			<div class="selected-animal" id="selected-animal"></div>
+			<button class="speech-button" id="speech-button">Start Speech Recognition</button>
+		</div>
+	</div>
+
+	<script>
+		// get the animal list element and the selected animal element
+		var animalList = document.getElementById("animal-list");
+		var selectedAnimal = document.getElementById("selected-animal");
+
+		// add a click event listener to the animal list
+		animalList.addEventListener("click", function(event) {
+			// get the clicked animal name
+			var clickedAnimalName = event.target.textContent;
+
+			// set the selected animal name to the clicked animal name
+			selectedAnimal.textContent = clickedAnimalName;
+		});
+
+		// create a speech recognition object
+		var recognition = new webkitSpeechRecognition();
+
+		// set the language to English
+		recognition.lang = 'en-US';
+
+		// set the maximum number of alternatives to 1
+		recognition.maxAlternatives = 1;
+
+		// add an event listener to the speech recognition object when the button is clicked
+        document.getElementById("speech-button").addEventListener("click", function() {
+        // start the speech recognition
+        recognition.start();
+		// show a message to indicate that speech recognition has started
+		selectedAnimal.textContent = "Listening...";
+	});
+
+	// add an event listener to the speech recognition object when it receives a result
+	recognition.addEventListener("result", function(event) {
+		// get the recognized speech
+		var speech = event.results[0][0].transcript;
+
+		// get the selected animal name
+		var selectedAnimalName = selectedAnimal.textContent;
+
+		// check if the recognized speech matches the selected animal name
+		if (speech.toLowerCase() === selectedAnimalName.toLowerCase()) {
+			// if the speech matches the selected animal name, show a success message
+			selectedAnimal.textContent = "Success!";
+		} else {
+			// if the speech does not match the selected animal name, show a fail message
+			selectedAnimal.textContent = "Fail!";
+		}
+	});
+
+	// add an event listener to the speech recognition object when it ends
+	recognition.addEventListener("end", function() {
+		// show a message to indicate that speech recognition has ended
+		selectedAnimal.textContent = "Speech Recognition Ended";
+	});
+</script>
+</body>
+</html>

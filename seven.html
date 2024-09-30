@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Animal List</title>
+	<style>
+		body {
+			display: flex;
+			flex-direction: row;
+			height: 100vh;
+			margin: 0;
+			padding: 0;
+		}
+
+		#left-column {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			background-color: #c2c2c2;
+			width: 20%;
+		}
+
+		#right-column {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			background-color: #f2f2f2;
+			width: 80%;
+		}
+
+		h1 {
+			margin-top: 0;
+		}
+
+		ul {
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+			cursor: pointer;
+		}
+
+		li {
+			padding: 5px 10px;
+		}
+
+		li:hover {
+			background-color: #ddd;
+		}
+
+		#selected-animal {
+			font-size: 24px;
+			font-weight: bold;
+			margin-top: 20px;
+		}
+
+		#speech-button {
+			font-size: 16px;
+			padding: 10px 20px;
+			margin-top: 20px;
+			cursor: pointer;
+		}
+	</style>
+</head>
+<body>
+	<div id="left-column">
+		<h1>Animal List</h1>
+		<ul id="animal-list">
+			<li>Lion</li>
+			<li>Tiger</li>
+			<li>Bear</li>
+			<li>Elephant</li>
+			<li>Giraffe</li>
+		</ul>
+	</div>
+	<div id="right-column">
+		<div id="selected-animal"></div>
+		<button id="speech-button">Start Speech Recognition</button>
+	</div>
+
+	<script>
+		var animalList = document.getElementById("animal-list");
+		var selectedAnimal = document.getElementById("selected-animal");
+		var recognition;
+
+		// add event listeners to the animal list items
+		animalList.addEventListener("click", function(event) {
+			// get the clicked animal name
+			var clickedAnimalName = event.target.textContent;
+
+			// display the clicked animal name in the selected animal section
+			selectedAnimal.textContent = clickedAnimalName;
+
+			// stop speech recognition if it is active
+			if (recognition && recognition.isActive()) {
+				recognition.stop();
+			}
+		});
+
+		// add an event listener to the speech button
+		document.getElementById("speech-button").addEventListener("click", function() {
+			// check if speech recognition is already active
+			if (recognition && recognition.isActive()) {
+				// if speech recognition is already active, stop it
+				recognition.stop();
+
+				// show a message to indicate that speech recognition has stopped
+				selectedAnimal.textContent = "Speech Recognition Stopped";
+			} else {
+				// if speech recognition is not active, create a new SpeechRecognition object
+				recognition = new window.webkitSpeechRecognition();
+
+				// set the language to English
+				recognition.lang = "en-US";
+
+				// start the speech recognition
+				recognition.start();
+
+				// show a message to indicate that speech recognition has started
+				selectedAnimal.textContent = "Listening...";
+
+				// add an event listener to the speech recognition object when it receives a result
+				recognition.addEventListener("result", function(event) {
+					
+                // get the recognized text
+                var recognizedText = event.results[0][0].transcript;
+
+				// get the selected animal name
+				var selectedAnimalName = selectedAnimal.textContent;
+
+				// check if the recognized text matches the selected animal name
+				if (recognizedText.toLowerCase() === selectedAnimalName.toLowerCase()) {
+					// if the recognized text matches the selected animal name, display a success message
+					selectedAnimal.textContent = "Success!";
+				} else {
+					// if the recognized text does not match the selected animal name, display a fail message
+					selectedAnimal.textContent = "Fail!";
+				}
+			});
+
+			// add an event listener to the speech recognition object when it ends
+			recognition.addEventListener("end", function(event) {
+				// check if the speech recognition was stopped intentionally or due to an error
+				if (selectedAnimal.textContent === "Speech Recognition Stopped") {
+					// if speech recognition was stopped intentionally, do nothing
+					return;
+				}
+
+				// if speech recognition was stopped due to an error, show an error message
+				if (event.error) {
+					selectedAnimal.textContent = "Speech Recognition Error";
+				} else {
+					// if speech recognition ended successfully, show a message to indicate that it has ended
+					selectedAnimal.textContent = "Speech Recognition Ended";
+				}
+			});
+		}
+	});
+</script>
+</body>
+</html>

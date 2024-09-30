@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Planet Recognition</title>
+	<meta charset="UTF-8">
+	<style>
+		/* Style for the top banner */
+		#banner {
+			background-color: grey;
+			color: white;
+			height: 100px;
+			text-align: center;
+			padding: 25px;
+		}
+		
+		/* Style for the left section */
+		#left {
+			background-color: #f2f2f2;
+			float: left;
+			width: 20%;
+			height: 500px;
+			padding: 20px;
+		}
+		
+		/* Style for the right section */
+		#right {
+			background-color: white;
+			float: left;
+			height: 500px;
+			padding: 20px;
+		}
+	</style>
+</head>
+<body>
+	<div id="banner">
+		<h1>Take it Easy</h1>
+	</div>
+	
+	<div id="left">
+		<h2>Poems</h2>
+		<ul>
+			<li id="twinkle">Twinkle</li>
+			<li id="mercury">Mercury</li>
+			<li id="venus">Venus</li>
+			<li id="earth">Earth</li>
+			<li id="mars">Mars</li>
+			<li id="jupiter">Jupiter</li>
+			<li id="saturn">Saturn</li>
+			<li id="uranus">Uranus</li>
+			<li id="neptune">Neptune</li>
+		</ul>
+	</div>
+	
+	<div id="right">
+		<h2>Select a Poem To Read</h2>
+		<p id="planet-name"></p>
+		<button id="recognition-btn" style="display: none;" onclick="startRecognition()" disabled>Start Reading</button>
+	</div>
+
+	<script>
+
+        const poems = [
+            "Twinkle, Twinkle Little Star \n How I wonder what you are",
+            "banana", "cherry", "date"
+        ];
+        var poemId = 0;
+        var poemwords = poems[poemId].split(" ");
+
+		var recognition;
+		function startRecognition() {
+			if ('webkitSpeechRecognition' in window) {
+				recognition = new webkitSpeechRecognition();
+				recognition.continuous = true;
+				recognition.interimResults = false;
+				recognition.lang = 'en-US';
+				recognition.start();
+				document.getElementById("recognition-btn").innerHTML = "Stop Reading";
+				document.getElementById("recognition-btn").onclick = stopRecognition;
+
+                var index = 0;
+                var faults = 0;
+                document.getElementById("right").innerHTML = "<h2>Let's Read One Word at a Time</h2><p><button id='recognition-btn' onclick='stopRecognition()'>Stop Reading</button><p><p>";
+                document.getElementById("right").innerHTML += poemwords[index];
+                var target = poemwords[index].toLowerCase();
+                alert(poemwords.length + " " + index);
+
+				recognition.onresult = function(event) {
+                    while (poemwords.length > index) {
+                        target = poemwords[index].toLowerCase();
+                        var speechResult = event.results[event.results.length-1][0].transcript.toLowerCase();
+
+                        alert(target + " " + speechResult + " " + index);
+
+                        if (target != speechResult) {
+                            alert("OK");
+                        } else {
+                            alert("NOT OK");
+                        }
+
+                        index += 1;
+                        document.getElementById("right").innerHTML += target;
+/*
+                        if (target != speechResult) {
+                            alert("NO " + fault);
+                            if (fault < 3) {
+                                faults += 1;
+                            } else {
+                                faults = 0;
+                                index += 1;
+                                document.getElementById("right").innerHTML += target;
+                            }
+                        } else {
+                            alert("ALL OK");
+                            faults = 0;
+                            index += 1;
+                            document.getElementById("right").innerHTML += target;
+                        }
+*/
+                    }
+                    document.getElementById("right").innerHTML = "<h2>Well Done</h2><p><button id='recognition-btn' onclick='startRecognition()'>Start Reading</button>";
+				};
+			} else {
+				alert('Speech recognition is not supported in this browser.');
+			}
+		}
+
+		function stopRecognition() {
+			recognition.stop();
+			document.getElementById("recognition-btn").innerHTML = "Start Reading";
+			document.getElementById("recognition-btn").onclick = startRecognition;
+		}
+
+        function setReadingPanel(poem) {
+            document.getElementById("recognition-btn").disabled = false;
+            document.getElementById("recognition-btn").style.display = "";
+			//document.getElementById("planet-name").innerHTML = poems[poemId];
+            poemwords = poems[poemId].split(" ");
+        }
+
+        // Set poem in left panel
+		document.getElementById("twinkle").addEventListener("click", function() {
+            setReadingPanel("Twinkle");
+		});
+
+		document.getElementById("mercury").addEventListener("click", function() {
+            setReadingPanel("Mercury");
+		});
+
+		document.getElementById("venus").addEventListener("click", function() {
+            setReadingPanel("Venus");
+        });
+
+        document.getElementById("earth").addEventListener("click", function() {
+	    	setReadingPanel("Earth");
+    	});
+
+        document.getElementById("mars").addEventListener("click", function() {
+            setReadingPanel("Mars");
+        });
+
+        document.getElementById("jupiter").addEventListener("click", function() {
+            setReadingPanel("Jupiter");
+        });
+
+        document.getElementById("saturn").addEventListener("click", function() {
+            setReadingPanel("Saturn");
+        });
+
+        document.getElementById("uranus").addEventListener("click", function() {
+            setReadingPanel("Uranus");
+        });
+
+        document.getElementById("neptune").addEventListener("click", function() {
+            setReadingPanel("Neptune");
+        });
+    </script>
+</body>
+</html>
+

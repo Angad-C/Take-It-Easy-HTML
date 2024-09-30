@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Take it Easy - own your pace</title>
+	<style>
+		/* styles for the banner section */
+		.banner {
+			background-color: #ffffff;
+			color: white;
+			height: 100px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 24px;
+		}
+
+		/* styles for the two column sections */
+		.container {
+			display: flex;
+			flex-wrap: wrap;
+			margin: 20px;
+		}
+
+		.left-column {
+			flex: 1;
+			margin: 10px;
+			padding: 20px;
+			background-color: #f8f9fa;
+			box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+			border-radius: 5px;
+			overflow-y: auto; /* add scroll bar when content is overflowed */
+			width: 20%;
+		}
+
+		.right-column {
+			flex: 4;
+			margin: 10px;
+			padding: 20px;
+			background-color: #f8f9fa;
+			box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+			border-radius: 5px;
+			overflow-y: auto; /* add scroll bar when content is overflowed */
+			width: 80%;
+		}
+
+		/* styles for the animal list */
+		.poem-list {
+			list-style: none;
+			padding: 0;
+		}
+
+		.poem-list li {
+			cursor: pointer;
+			padding: 5px;
+			border-radius: 5px;
+			margin-bottom: 5px;
+			background-color: #e9ecef;
+		}
+
+		.poem-list li:hover {
+			background-color: #ced4da;
+		}
+
+		.selected-animal {
+			font-weight: bold;
+		}
+
+		#confetti{
+			position: absolute;
+			left: 0;
+			top: 0;
+			height: 100%;
+			width: 100%;
+			pointer-events: none
+		}		
+	</style>
+</head>
+<body>
+	<canvas height='1' id='confetti' width='1'></canvas>
+
+	<!-- banner section -->
+	<div class="banner">
+		<h1><img src="Banner.png" height=90></img></h1>
+	</div>
+
+	<!-- two column sections -->
+	<div class="container">
+		<!-- left column for poem list -->
+		<div id="left" class="left-column column">
+			<h2>Poems</h2>
+			<ul class="poem-list" id="poem-list">
+				<li id="0">Twinkle, Twinkle</li>
+				<li id="1">The Mock Turtle's Song</li>
+				<li id="2">At the Zoo</li>
+				<li id="3">Mary had a little lamb</li>
+				<li id="4">Nature's First Green is Gold</li>
+				<li id="5">Autumn</li>
+				<li id="6">From A Railway Carriage</li>
+				<li id="7">How do you like to go up in a swing</li>
+				<li id="8">In winter I get up at night</li>
+				<li id="9">Who has seen the wind?</li>
+				<li id="10">Hush little baby</li>
+			</ul>
+		</div>
+        
+		<!-- right column for selected animal display -->
+		<div id="right" class="right-column column">
+			<h2>Select a Poem To Read</h2>
+			<p id="PoemsToReadSlow"></p>
+			<button id="recognition-btn" style="display: none;" onclick="startRecognition()" disabled>Start Reading</button>
+		</div>
+	</div>
+	<a href="https://www.angadc.net/">Angad Chhibber</a>
+	<script>
+		var index = 0;
+        const poems = [
+        `Twinkle, twinkle, little star!\n How I wonder what you are,\n Up above the world so high,\n Like a diamond in the sky.`,//  — Jane Taylor
+        `"Will you walk a little faster?" said a whiting to a snail.\n "There's a porpoise close behind us, and he's treading on my tail.\n See how eagerly the lobsters and the turtles all advance!\n They are waiting on the shingle—will you come and join the dance?\n Will you, won't you, will you, won't you, will you join the dance?\n Will you, won't you, will you, won't you, won't you join the dance?`, // Lewis Carroll
+        `First I saw the white bear, then I saw the black;\n Then I saw the camel with a hump upon his back;\n Then I saw the grey wolf, with mutton in his maw;\n Then I saw the wombat waddle in the straw;\n Then I saw the elephant a-waving of his trunk;\n Then I saw the monkeys—mercy, how unpleasantly they smelt!`,
+        `Mary had a little lamb,\n Its fleece was white as snow,\n And every where that Mary went\n The lamb was sure to go;\n He followed her to school one day\n That was against the rule,\n It made the children laugh and play,\n To see a lamb at school.`,
+        `Nature's first green is gold,\n Her hardest hue to hold.\n Her early leaf's a flower;\n But only so an hour.\n Then leaf subsides to leaf.\n So Eden sank to grief,\n So dawn goes down to day.\n Nothing gold can stay.`,
+        `In the dreamy silence\n Of the afternoon, a\n Cloth of gold is woven\n Over wood and prairie;\n And the jaybird, newly\n Fallen from the heaven,\n Scatters cordial greetings,\n And the air is filled with\n Scarlet leaves, that, dropping,\n Rise again, as ever,\n With a useless sigh for\n Rest—and it is Autumn.`,
+        `Faster than fairies, faster than witches,\n Bridges and houses, hedges and ditches;\n And charging along like troops in a battle,\n  All through the meadows the horses and cattle:\n All of the sights of the hill and the plain\n Fly as thick as driving rain;\n And ever again, in the wink of an eye,\n Painted stations whistle by`, //  — Robert Louis Stevenson
+        `How do you like to go up in a swing,\n Up in the air so blue?\nOh, I do think it the pleasantest thing\n Ever a child can do!`, //  — Robert Louis Stevenson
+        `In winter I get up at night\n And dress by yellow candle-light.\n In summer, quite the other way,\n I have to go to bed by day.`, // Robert Louis Stevenson
+        `Who has seen the wind?\n Neither I nor you:\n But when the leaves hang trembling,\n The wind is passing through.`, // Christina Rossetti
+        `Hush little baby, don't say a word,\n Papa's gonna buy you a mockingbird.\n And if that mockingbird won't sing,\n Papa's gonna buy you a diamond ring.\n And if that diamond ring turns to brass,\n Papa's gonna buy you a looking glass.\n And if that looking glass gets broke,\n Papa's gonna buy you a billy goat.\n And if that billy goat won't pull,\n Papa's gonna buy you a cart and bull.\n And if that cart and bull turn over,\n Papa's gonna buy you a dog named Rover.\n And if that dog named Rover won't bark,\n Papa's gonna buy you a horse and cart.\n And if that horse and cart fall down,\n You'll still be the sweetest little baby in town!` // Anonymous
+        ];
+
+		const poemTitles = [
+			"<h1>Twinkle, Twinkle<p>--Jane Taylor</h1>",
+			"<h1>The Mock Turtle's Song<p>-- Lewis Carroll</h1>",
+			"<h1>At the Zoo<p>-- William Makepeace Thackeray</h1>",
+			"<h1>Mary had a little lamb<p>-- Sarah Josepha Hale</h1>",
+			"<h1>Nature's first green is gold<p>-- Robert Frost</h1>",
+			"<h1>Autumn<p>-- Alexander Posey</h1>",
+			"<h1>From A Railway Carriage<p>-— Robert Louis Stevenson</h1>",
+			"<h1>How do you like to go up in a swing<p>-— Robert Louis Stevenson</h1>",
+			"<h1>In winter I get up at night<p>-- Robert Louis Stevenson</h1>",
+			"<h1>Who has seen the wind?<p>-- Christina Rossetti</h1>",
+			"<h1>Hush little baby<p>-- Anonymous</h1>"
+	    ];
+
+        var poemId = 0;
+        var poemwords = poems[poemId].split(" ");
+
+		var recognition;
+		function onlyLetters(str) {
+			return /^[A-Za-z]*$/.test(str);
+		}
+
+		window.onload = function() {
+			for (var i = 0; i < poems.length; i++) {
+				document.getElementById(i.toString()).addEventListener("click", function() {
+					setReadingPanel(parseInt(this.id))
+				});
+			}
+		}
+		
+		function startRecognition() {
+			if ('webkitSpeechRecognition' in window) {
+				recognition = new webkitSpeechRecognition();
+				recognition.continuous = true;
+				recognition.interimResults = false;
+				recognition.lang = 'en-US';
+				recognition.start();
+				document.getElementById("recognition-btn").innerHTML = "Stop Reading";
+				document.getElementById("recognition-btn").onclick = stopRecognition;
+
+                var index = 0;
+				//console.log("STARTING");
+                var faults = 0;
+				var pagetop = "<h2>Let's Read One Word at a Time</h2><p><button id='recognition-btn' onclick='stopRecognition()'>Stop Reading</button><p>";
+				var readpoem = poemwords[index]+ " ";
+                document.getElementById("right").innerHTML = pagetop + "<pre>" + readpoem;
+                var target = poemwords[index].toLowerCase();
+				var regexPattern = /[^A-Za-z]/g;
+
+                recognition.onresult = function(event) {
+                    target = poemwords[index].toLowerCase().replace(regexPattern, "");
+                    var speechResult = event.results[event.results.length-1][0].transcript.toLowerCase().trim();
+
+                    if (target === speechResult) {
+						//console.log("MATCH");
+                        index+=1;
+						if (poemwords.length > index) {
+							readpoem += poemwords[index] + " ";
+	                        document.getElementById("right").innerHTML = pagetop + "<pre>" + readpoem;
+						}
+                        faults = 0;
+                    } else {
+						console.log("MISMATCH target " + target +  " vs read " + speechResult + " " + (target === speechResult));
+                        faults+=1;
+                        if (faults >= 3) {
+                            faults = 0;
+                            index+=1;
+							if (poemwords.length > index) {
+								readpoem += poemwords[index] + " ";
+                            	document.getElementById("right").innerHTML = pagetop + "<pre>" + readpoem;
+							}
+                        }
+                    }
+					//console.log("INDEX is " + index);
+
+                    if (poemwords.length <= index) {
+						stopRecognition();
+                        return;
+                    }
+                    //console.log("=======> " +target + " " + speechResult + " " + index + " <======");
+                };
+
+			} else {
+				alert('Speech recognition is not supported in this browser.');
+			}
+		}
+    
+		function stopRecognition() {
+			recognition.stop();
+			document.getElementById("right").innerHTML = `<h2>Well Done</h2>
+			<p><h2>Select a Poem To Read</h2>
+				<p id="PoemsToReadSlow"></p>
+				<button id="recognition-btn" style="display: none;" onclick="startRecognition()" disabled>Start Reading</button>`;
+
+			document.getElementById("recognition-btn").innerHTML = "Start Reading";
+			document.getElementById("recognition-btn").onclick = startRecognition;
+		}
+
+        function setReadingPanel(poemId) {
+			// TODO -= ADD TITLE ON TOP
+			document.getElementById("right").innerHTML = poemTitles[poemId]+`
+				<p id="PoemsToReadSlow"></p>
+				<button id="recognition-btn" style="display: none;" onclick="startRecognition()" disabled>Start Reading</button>`;
+
+            document.getElementById("recognition-btn").disabled = false;
+            document.getElementById("recognition-btn").style.display = "";
+            poemwords = poems[poemId].split(" ");
+        }
+
+    </script>
+</body>
+</html>
+

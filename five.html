@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Three Section Page with Animal List</title>
+	<style>
+		/* styles for the banner section */
+		.banner {
+			background-color: #007bff;
+			color: white;
+			height: 80px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 24px;
+		}
+
+		/* styles for the two column sections */
+		.container {
+			display: flex;
+			flex-wrap: wrap;
+			margin: 20px;
+		}
+
+		.left-column {
+			flex: 1;
+			margin: 10px;
+			padding: 20px;
+			background-color: #f8f9fa;
+			box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+			border-radius: 5px;
+			overflow-y: auto; /* add scroll bar when content is overflowed */
+			width: 20%;
+		}
+
+		.right-column {
+			flex: 4;
+			margin: 10px;
+			padding: 20px;
+			background-color: #f8f9fa;
+			box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+			border-radius: 5px;
+			overflow-y: auto; /* add scroll bar when content is overflowed */
+			width: 80%;
+		}
+
+		/* styles for the animal list */
+		.animal-list {
+			list-style: none;
+			padding: 0;
+		}
+
+		.animal-list li {
+			cursor: pointer;
+			padding: 5px;
+			border-radius: 5px;
+			margin-bottom: 5px;
+			background-color: #e9ecef;
+		}
+
+		.animal-list li:hover {
+			background-color: #ced4da;
+		}
+
+		.selected-animal {
+			font-weight: bold;
+		}
+	</style>
+	<script>
+		window.onload = function() {
+			// get the animal list and selected animal elements
+			var animalList = document.getElementById("animal-list");
+			var selectedAnimal = document.getElementById("selected-animal");
+
+			// add click event listeners to the animal list items
+			var animalItems = animalList.getElementsByTagName("li");
+			for (var i = 0; i < animalItems.length; i++) {
+				animalItems[i].addEventListener("click", function() {
+					// set the selected animal element text to the clicked item text
+					selectedAnimal.textContent = this.textContent;
+
+					// remove the selected class from all list items and add it to the clicked item
+					for (var j = 0; j < animalItems.length; j++) {
+						animalItems[j].classList.remove("selected-animal");
+					}
+					this.classList.add("selected-animal");
+				});
+			}
+
+			// initialize the speech recognition object
+			var recognition = new webkitSpeechRecognition();
+
+			// set recognition options
+			recognition.continuous = true;
+			recognition.interimResults = true;
+			recognition.lang = 'en-US';
+
+			// when recognition is started, print a message to the console
+			recognition.onstart = function() {
+				console.log('Speech recognition started');
+            };
+
+// when recognition is stopped, print a message to the console
+recognition.onend = function() {
+    console.log('Speech recognition stopped');
+};
+
+// when recognition has a result, check if it matches the selected animal name
+recognition.onresult = function(event) {
+    // get the last recognition result
+    var result = event.results[event.results.length - 1];
+
+    // if the result is final, check if it matches the selected animal name
+    if (result.isFinal) {
+        // get the recognized text
+        var recognizedText = result[0].transcript.trim().toLowerCase();
+
+        // get the selected animal name
+        var selectedAnimalName = selectedAnimal.textContent.trim().toLowerCase();
+
+        // check if the recognized text matches the selected animal name
+        if (recognizedText === selectedAnimalName) {
+            console.log("success");
+        } else {
+            console.log("fail");
+        }
+    }
+};
+
+// start recognition when the left column is clicked
+var leftColumn = document.querySelector('.right-column');
+leftColumn.addEventListener("click", function() {
+    console.log('Speech recognition started');
+    recognition.start();
+});
+};
+</script>
+</head>
+<body>
+	<!-- banner section -->
+	<div class="banner">
+		Three Section Page with Animal List
+	</div>
+    <!-- two column sections -->
+<div class="container">
+	<!-- left column for animal list -->
+	<div class="left-column column">
+		<h2>Animal List</h2>
+		<ul class="animal-list" id="animal-list">
+			<li>Lion</li>
+			<li>Tiger</li>
+			<li>Bear</li>
+			<li>Elephant</li>
+			<li>Giraffe</li>
+			<li>Monkey</li>
+			<li>Kangaroo</li>
+			<li>Hippo</li>
+			<li>Rhinoceros</li>
+			<li>Wolf</li>
+			<li>Crocodile</li>
+			<li>Penguin</li>
+			<li>Panda</li>
+		</ul>
+	</div>
+
+	<!-- right column for selected animal display -->
+	<div class="right-column column">
+		<h2>Selected Animal</h2>
+		<div class="selected-animal" id="selected-animal"></div>
+	</div>
+</div>
+</body>
+</html>
